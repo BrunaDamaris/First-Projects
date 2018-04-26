@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <stdlib.h>
 #include <strings.h> // coloquei pra bzero
+#include <unistd.h>
 #define SA struct sockaddr
 // fiz a echo só pra rodar mesmo mas por enquanto ela não faz nada sem o cliente então ignorem,precisamos saber mais sobre a mesma
 void str_echo(int sockfd)
