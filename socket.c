@@ -27,7 +27,7 @@ void str_echo(int sockfd)
 
 	struct in_addr sin_addr;	
 	char   sin_zero[8];
-}; descobri que se faz o struct lá não precisa dele aqui*/ 
+}; descobri que se faz o struct lá na main não precisa dele aqui*/ 
 
 int main()
 {
