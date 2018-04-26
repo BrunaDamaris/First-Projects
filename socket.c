@@ -10,7 +10,7 @@
 void str_echo(int sockfd)
 {
 	ssize_t n;
-	char buf[4096];// valor dado pelo livro para o comprimento de linha max do buffer
+	char buf[4096];// valor dado pelo livro para o comprimento de linha max do buffer???
 	again: // O QUE BOBA É ISSO????
 	while(( n = read(sockfd,buf,4096)) > 0)//read maior que zero pq tem que retornar algo??
 	{
