@@ -37,7 +37,7 @@ int main(int  argc, char *argv[])
 	GtkWidget *botao;// atribui um botão
 	GtkWidget *botao1;
 	GtkWidget *botao2; 
-	GtkWidget *box1; // "caixa" para colocar vários gadgets em uma pagina
+	GtkWidget *box1; // "caixa" para colocar vários widgets em uma pagina
 
 	gtk_init(&argc,&argv); //pointers do gtk_init
 
