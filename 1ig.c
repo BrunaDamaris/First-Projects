@@ -3,31 +3,55 @@
 void clique1( GtkWidget *widget,gpointer data)
 {
 	GtkWidget *janela1;
+	GtkWidget *box2;
+	GtkWidget *texto;
 
 	janela1 = gtk_window_new (GTK_WINDOW_TOPLEVEL); // cria janela
 	gtk_container_set_border_width(GTK_CONTAINER(janela1),200);//ajuste de altura e largura
 	gtk_window_set_title(GTK_WINDOW(janela1),"Sala 1"); // nome da janela
+
+	box2 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(janela1),box2);
+
+	texto = gtk_entry_new();// para entrada de texto
+	gtk_box_pack_start(GTK_BOX(box2),texto,FALSE,FALSE,0);//coloca na caixa
 	
   	gtk_widget_show_all(janela1);
 }
 void clique2( GtkWidget *widget,gpointer data)
 {
 	GtkWidget *janela1;
+	GtkWidget *box2;
+	GtkWidget *texto;
 
 	janela1 = gtk_window_new (GTK_WINDOW_TOPLEVEL); // cria janela
 	gtk_container_set_border_width(GTK_CONTAINER(janela1),200);//ajuste de altura e largura
 	gtk_window_set_title(GTK_WINDOW(janela1),"Sala 2"); // nome da janela
+
+	box2 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(janela1),box2);
+
+	texto = gtk_entry_new();// para entrada de texto
+	gtk_box_pack_start(GTK_BOX(box2),texto,FALSE,FALSE,0);//coloca na caixa
  
   	gtk_widget_show_all(janela1);
 }
 void clique3( GtkWidget *widget,gpointer data)
 {
 	GtkWidget *janela1;
+	GtkWidget *box2;
+	GtkWidget *texto;
 
 	janela1 = gtk_window_new (GTK_WINDOW_TOPLEVEL); // cria janela
 	gtk_container_set_border_width(GTK_CONTAINER(janela1),200);//ajuste de altura e largura
 	gtk_window_set_title(GTK_WINDOW(janela1),"Sala 3"); // nome da janela
  
+ 	box2 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(janela1),box2);
+
+ 	texto = gtk_entry_new();// para entrada de texto
+	gtk_box_pack_start(GTK_BOX(box2),texto,FALSE,FALSE,0);//coloca na caixa
+
   	gtk_widget_show_all(janela1);
 }
 
