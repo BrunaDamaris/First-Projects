@@ -32,15 +32,19 @@ void str_cli(FILE *fp, int meusocket,GtkWidget *widget,GtkWidget *entrada)
   	const gchar *mensagem,*msg;
  	
 	mensagem = gtk_entry_get_text(GTK_ENTRY(entrada));
+	printf("Mensagem enviada: %s\n", mensagem);
 	write(meusocket, mensagem, strlen(mensagem));
+
+	printf("aguardando mensagem ...\n");
 	
   	read(meusocket, msgreceb, 4096);
-  	for(i=0;i < strlen(msgreceb);i++)
-  	{
-  		msg = msgreceb;
-  	}
+
+  	printf(" Mensagem recebida: %s\n", msgreceb);
+
+  	msg = msgreceb;
+
   	gtk_text_buffer_get_iter_at_line(saida,&inicio,i);
-  	gtk_text_buffer_insert(saida,&inicio,msg,-1);
+  	gtk_text_buffer_insert(saida,&inicio,msgreceb,-1);
 }
 
 void str_echo(int meusocket)
