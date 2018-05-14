@@ -4,7 +4,10 @@
 FILE *out;
 GtkWidget *p;
 GtkWidget *q;
+GtkWidget *e; 
 GtkWidget *label_out;
+long int npublickey=0;
+long int enumber=0;
 
 int primo(long int a, long int b)
 {
@@ -39,28 +42,29 @@ int primo(long int a, long int b)
 
 int firstnumbern(GtkButton *button, gpointer data)
 {
-	long int firstnumber=0,secondnumber=0,npublickey=0;
+	long int firstnumber=0,secondnumber=0;
 
 	firstnumber=atol(gtk_entry_get_text(GTK_ENTRY(p)));
 
 	secondnumber=atol(gtk_entry_get_text(GTK_ENTRY(q)));
 
 	npublickey=firstnumber*secondnumber;
+	//enumber=(firstnumber-1)*(secondnumber-1);
 
-	/*out = fopen("criptout","w+");
-	fwrite(&npublickey,sizeof(long int),1,out);
-	fclose(out);*/
+	out = fopen("chave_publica.txt","w+");
+	fprintf(out,"N: %ld E: %ld\n",npublickey,enumber); 
+	fclose(out);
 
 	if(npublickey && primo(firstnumber,secondnumber) !=0 )
 	{
-		char text[10] = "Done!";
+		char text[100] = "Números válidos!";
 		gtk_label_set_text(GTK_LABEL(label_out),text);
 		printf("%ld\n",npublickey);
 		
 	}
 	else
 	{
-		char text1[10] = "Try again";
+		char text1[100] = "Número inválido!!Digite novamente!";
 		gtk_label_set_text(GTK_LABEL(label_out),text1);
 	}
 	
@@ -72,6 +76,7 @@ void gerar_chave_publica()
 	GtkWidget *boxv1;
 	GtkWidget *label;
 	GtkWidget *label1;
+	GtkWidget *label2;
 	GtkWidget * button;
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window),100);
@@ -94,11 +99,18 @@ void gerar_chave_publica()
 	gtk_entry_set_max_length(GTK_ENTRY(q),10);
 	gtk_box_pack_start(GTK_BOX(boxv1),q,FALSE,FALSE,0);
 
+	label2 = gtk_label_new("Digite e:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
+
+	e = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(e),10);
+	gtk_box_pack_start(GTK_BOX(boxv1),e,FALSE,FALSE,0);
+
 	button = gtk_button_new_with_label("Go!");
 	gtk_box_pack_start(GTK_BOX(boxv1),button,FALSE,FALSE,0);
 	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(firstnumbern), NULL);
 
-	label_out = gtk_label_new("Waiting...");
+	label_out = gtk_label_new("Em espera...");
 	gtk_box_pack_start(GTK_BOX(boxv1),label_out,FALSE,FALSE,0);
 
 	gtk_widget_show_all(window);
@@ -110,7 +122,6 @@ void gerar_chave_publica()
 	gtk_container_set_border_width(GTK_CONTAINER(window),100);
 	gtk_window_set_title(GTK_WINDOW(window),"Criptografia");
 }
-
 void descriptografar(GtkWidget *widget,gpointer data)
 {
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
