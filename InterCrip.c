@@ -95,7 +95,7 @@ int firstnumbern(GtkButton *button, gpointer data)
 	}
 	else
 	{
-		char text1[100] = "Hint: Enter a prime number next to a multiple of %d\n";
+		char text1[100] = "Invalid Number!!!!Hint: Enter a prime number next to a multiple of ";
 		gtk_label_set_text(GTK_LABEL(label_out),text1);
 	}
 	
