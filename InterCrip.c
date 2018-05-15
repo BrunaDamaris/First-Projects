@@ -11,6 +11,7 @@ GtkWidget *q;
 GtkWidget *e;
 GtkWidget *label_out;
 GtkWidget *text;
+GtkWidget *label1;
 
 long int enumber;
 long int npublickey;
@@ -48,7 +49,7 @@ int primo(long int a, long int b)
 {
 	long int d;
 	int achei= 0, achei2=0;
-	for(d=2; d*d<=a && !achei;d+=2)
+	for(d=2; d*d<=a && !achei;d++)
 	{
 		if(a%d==0)
 		{
@@ -56,7 +57,7 @@ int primo(long int a, long int b)
 			break;
 		}
 	}
-	for(d=2; d*d<=b && !achei2;d+=2)
+	for(d=2; d*d<=b && !achei2;d++)
 	{
 		if(b%d==0)
 		{
@@ -100,7 +101,7 @@ int firstnumbern(GtkButton *button, gpointer data)
 			break;
 		}
 	}
-	if(npublickey && (primo(firstnumber,secondnumber) !=0) && validate != 0)
+	if(npublickey && (primo(firstnumber,secondnumber) != 0) && validate != 0)
 	{
 		char text[100] = "Valid numbers!";
 		gtk_label_set_text(GTK_LABEL(label_out),text);
@@ -163,8 +164,7 @@ void gerar_chave_publica()
 }
 void criptografar(GtkWidget *widget,gpointer data)
 {
-	long int option,len,index,letter;
-	char message[max], numeric_m[max];
+	long int option,len,index,letter,numeric_m[max];
 	char *rt;
 	rt = strdup(gtk_entry_get_text(GTK_ENTRY(text)));
 	strcpy(cripto,rt);
@@ -177,23 +177,26 @@ void criptografar(GtkWidget *widget,gpointer data)
 	printf("Your message converted to decimal ASCII TABLE:\n");
 	for(index=0;index<len;index++)
 	{
-		 printf("%d ",numeric_m[index]);
+		 printf("%ld ",numeric_m[index]);
 		 numeric_m[index] = fastexpmod(numeric_m[index],enumber,npublickey);
 	}
 	printf("\n");
+	printf("Your message:");
 	for(index=0;index<len;index++)
 	{ 
-		out1 = fopen("criptografado.txt","a");
-		fprintf(out1,"%d ",numeric_m[index]);
+		out1 = fopen("criptografado.txt","a+");
+		fprintf(out1,"%ld ",numeric_m[index]);
+		printf("%ld ",numeric_m[index]);
 		fclose(out1);
 	}
+	char text1[100] = "Criptografado!!";
+	gtk_label_set_text(GTK_LABEL(label1),text1);
 }
 void wcriptografar(GtkWidget *widget,gpointer data)
 {
 	GtkWidget *window;
 	GtkWidget *boxv1;
 	GtkWidget *label;
-	GtkWidget *label1;
 	GtkWidget * button;
 
 
@@ -213,6 +216,8 @@ void wcriptografar(GtkWidget *widget,gpointer data)
 
 	g_signal_connect(text,"activate",G_CALLBACK(criptografar),text);
 
+	label1 = gtk_label_new("waiting...");
+	gtk_box_pack_start(GTK_BOX(boxv1),label1,FALSE,FALSE,0);
 	
 	gtk_widget_show_all(window);
 }	
