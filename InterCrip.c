@@ -12,12 +12,25 @@ GtkWidget *e;
 GtkWidget *label_out;
 GtkWidget *text;
 GtkWidget *label1;
+GtkWidget *label2;
 
+long int dnumber;
+long int option,len,inde,letter,numeric_m[max];
+char *rt;
 long int enumber;
 long int npublickey;
 char cripto[max];
 const char *realtext;
 
+
+int inverso(int e,int phi)
+{
+	int x;
+	for(x=1;x<=phi;x++)
+	{
+		if((e*x)%phi==1) return x;
+	}
+}
 char *strdup (const char *s) 
 {
     char *rt = malloc (strlen (s) + 1);   // Space for length plus nul
@@ -75,6 +88,111 @@ int primo(long int a, long int b)
 	}
 
 }
+void criptografar(GtkWidget *widget,gpointer data)
+{
+
+	rt = strdup(gtk_entry_get_text(GTK_ENTRY(text)));
+	strcpy(cripto,rt);
+	len = strlen(cripto);
+	for(inde=0;inde<len;inde++)
+	{
+		letter = cripto[inde];
+		numeric_m[inde] = letter;
+	}
+	printf("Your message converted to decimal ASCII TABLE:\n");
+	for(inde=0;inde<len;inde++)
+	{
+		out1 = fopen("criptografado.txt","a+");
+		printf("%ld ",numeric_m[inde]);
+		numeric_m[inde] = fastexpmod(numeric_m[inde],enumber,npublickey);
+		fprintf(out1,"%ld ",numeric_m[inde]);
+		fclose(out1);
+	}
+	printf("\n");
+	printf("Your message:");
+
+	char text1[100] = "Criptografado!!";
+	gtk_label_set_text(GTK_LABEL(label1),text1);
+}
+void wcriptografar(GtkWidget *widget,gpointer data)
+{
+	GtkWidget *window;
+	GtkWidget *boxv1;
+	GtkWidget *label;
+	GtkWidget * button;
+
+
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_container_set_border_width(GTK_CONTAINER(window),100);
+	gtk_window_set_title(GTK_WINDOW(window),"Criptografia");
+
+	boxv1 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(window),boxv1);
+
+	label = gtk_label_new("Type something!!:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
+
+	text = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(text),100);
+	gtk_box_pack_start(GTK_BOX(boxv1),text,FALSE,FALSE,0);
+
+	g_signal_connect(text,"activate",G_CALLBACK(criptografar),text);
+
+	label1 = gtk_label_new("waiting...");
+	gtk_box_pack_start(GTK_BOX(boxv1),label1,FALSE,FALSE,0);
+	
+	gtk_widget_show_all(window);
+}
+void gogo(GtkWidget *widget,gpointer data)
+{
+	char text1[100] = "Descriptografado!!";
+	gtk_label_set_text(GTK_LABEL(label2),text1);
+}
+void descriptografar(GtkWidget *widget,gpointer data)
+{
+	char letter1,msg[10000];
+	GtkWidget *window;
+	GtkWidget *boxv1;
+	GtkWidget *button;
+	GtkWidget *text3;
+
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_container_set_border_width(GTK_CONTAINER(window),100);
+	gtk_window_set_title(GTK_WINDOW(window),"Descrypt");
+
+	boxv1 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(window),boxv1);
+
+	label2 = gtk_label_new("Now, tell the message encrypted:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
+
+	text3 = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(text3),100);
+	gtk_box_pack_start(GTK_BOX(boxv1),text3,FALSE,FALSE,0);
+
+	for(inde=0;inde<len;inde++)
+	{
+		out2 = fopen("descriptografado.txt","a+");
+		numeric_m[inde]= fastexpmod(numeric_m[inde],dnumber,npublickey);
+		printf("%ld\n",numeric_m[inde]);
+		letter1 = numeric_m[inde];
+		msg[inde] = letter1;
+		fprintf(out2,"%c ",msg[inde]);
+		printf("%c ",msg[inde]);
+		fclose(out2);
+		
+	}
+	label2 = gtk_label_new("waiting...");
+	g_signal_connect(text3,"activate",G_CALLBACK(gogo),text3);
+	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
+	
+	
+	gtk_widget_show_all(window);
+
+
+
+}
+
 
 int firstnumbern(GtkButton *button, gpointer data)
 {
@@ -85,7 +203,10 @@ int firstnumbern(GtkButton *button, gpointer data)
 	secondnumber=atol(gtk_entry_get_text(GTK_ENTRY(q)));
 
 	npublickey=firstnumber*secondnumber;
+
 	phi = (firstnumber-1)*(secondnumber-1);
+
+	dnumber = inverso(enumber,phi);
 	while(m!=1)
 	{ 
 		enumber=atol(gtk_entry_get_text(GTK_ENTRY(e)));
@@ -96,7 +217,7 @@ int firstnumbern(GtkButton *button, gpointer data)
 			break;
 		}
 		else
-		{
+		{ 
 			printf("Didn't work\n");
 			break;
 		}
@@ -162,81 +283,15 @@ void gerar_chave_publica()
 
 	gtk_widget_show_all(window);
 }
-void criptografar(GtkWidget *widget,gpointer data)
-{
-	long int option,len,index,letter,numeric_m[max];
-	char *rt;
-	rt = strdup(gtk_entry_get_text(GTK_ENTRY(text)));
-	strcpy(cripto,rt);
-	len = strlen(cripto);
-	for(index=0;index<len;index++)
-	{
-		letter = cripto[index];
-		numeric_m[index] = letter;
-	}
-	printf("Your message converted to decimal ASCII TABLE:\n");
-	for(index=0;index<len;index++)
-	{
-		 printf("%ld ",numeric_m[index]);
-		 numeric_m[index] = fastexpmod(numeric_m[index],enumber,npublickey);
-	}
-	printf("\n");
-	printf("Your message:");
-	for(index=0;index<len;index++)
-	{ 
-		out1 = fopen("criptografado.txt","a+");
-		fprintf(out1,"%ld ",numeric_m[index]);
-		printf("%ld ",numeric_m[index]);
-		fclose(out1);
-	}
-	char text1[100] = "Criptografado!!";
-	gtk_label_set_text(GTK_LABEL(label1),text1);
-}
-void wcriptografar(GtkWidget *widget,gpointer data)
-{
-	GtkWidget *window;
-	GtkWidget *boxv1;
-	GtkWidget *label;
-	GtkWidget * button;
-
-
-	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_container_set_border_width(GTK_CONTAINER(window),100);
-	gtk_window_set_title(GTK_WINDOW(window),"Criptografia");
-
-	boxv1 = gtk_vbox_new(FALSE,0);
-	gtk_container_add(GTK_CONTAINER(window),boxv1);
-
-	label = gtk_label_new("Type something!!:");
-	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
-
-	text = gtk_entry_new();
-	gtk_entry_set_max_length(GTK_ENTRY(text),100);
-	gtk_box_pack_start(GTK_BOX(boxv1),text,FALSE,FALSE,0);
-
-	g_signal_connect(text,"activate",G_CALLBACK(criptografar),text);
-
-	label1 = gtk_label_new("waiting...");
-	gtk_box_pack_start(GTK_BOX(boxv1),label1,FALSE,FALSE,0);
-	
-	gtk_widget_show_all(window);
-}	
-/*void descriptografar(GtkWidget *widget,gpointer data)
-{
-	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_container_set_border_width(GTK_CONTAINER(window),100);
-	gtk_window_set_title(GTK_WINDOW(window),"Descriptografia");
-}*/
-
 int main(int argc, char *argv[])
 
 {
 	GtkWidget *window;
 	GtkWidget *botao1;
-	GtkWidget *botao2;
-	GtkWidget *botao3;
 	GtkWidget *label;
 	GtkWidget *boxv1;
+	GtkWidget *botao2;
+	GtkWidget *botao3;
 
 	gtk_init(&argc,&argv);
 
@@ -260,7 +315,7 @@ int main(int argc, char *argv[])
 	gtk_box_pack_start(GTK_BOX(boxv1),botao2,FALSE,FALSE,0);
 
 	botao3 = gtk_button_new_with_label("Descriptografar");
-	//g_signal_connect(G_OBJECT (botao3),"clicked",G_CALLBACK(descriptografar),NULL);// função
+	g_signal_connect(G_OBJECT(botao3),"clicked",G_CALLBACK(descriptografar),NULL);
 	gtk_box_pack_start(GTK_BOX(boxv1),botao3,FALSE,FALSE,0);
 
 	gtk_widget_show_all(window);
@@ -269,3 +324,43 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+/*
+if(option==1)
+			{
+			printf("Now, you have to write the message you want to encrypt.\n");
+			scanf(" %[^\n]s", message);
+			len= strlen(message);
+			for(index=0;index<len;index++)
+			{
+				letter = message[index];
+				numeric_m[index] = letter;
+			}
+			printf("Your message converted to decimal ASCII TABLE:\n");
+			for(index=0;index<len;index++)
+			{
+		  		printf("%ld ", numeric_m[index]);
+		  		numeric_m[index]= fastexpmod(numeric_m[index], e, n);
+			}
+			printf("\n");
+			printf("Your message encrypted is:\n");
+			for(index=0;index<len;index++)
+			{
+		 		 if(index==len-1) printf("%ld\n", numeric_m[index]);
+		 		 else printf("%ld#", numeric_m[index]);
+			}
+			printf("Your message decrypted is:\n");
+			for(index=0;index<len;index++)
+			{
+		 		 numeric_m[index]= fastexpmod(numeric_m[index], pkd, n);
+		 		 printf("%ld#", numeric_m[index]);
+			}
+			printf("\n");
+			for(index=0;index<len;index++)
+			{
+		 		 letter = numeric_m[index];
+		 		 message[index] = letter;
+		 		 printf("%c", message[index]);
+			}
+			printf("\n");
+			}
+			*/
