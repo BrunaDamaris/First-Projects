@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #define max 100000
+
+// Global
 FILE *out;
 FILE *out1;
 FILE *out2;
@@ -26,6 +28,8 @@ long long int enumber;
 long long int npublickey;
 char cripto[max];
 const char *realtext;
+
+//Global
 
 void converttolongint(char *line)
 {
@@ -384,20 +388,23 @@ int main(int argc, char *argv[])
     gdk_color_parse ("lime", &color1);
     gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
 
-    if(GTK_IS_BIN(botao1)) {
+    if(GTK_IS_BIN(botao1))
+    {
         GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao1));
         gdk_color_parse ("green", &color1);
         gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
     }
 
-    if(GTK_IS_BIN(botao2)) {
+    if(GTK_IS_BIN(botao2))
+    {
         GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao2));
         gdk_color_parse ("green", &color1);
         gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
     }
 
-    if(GTK_IS_BIN(botao3)) {
-        GtkWidget *child = gtk_bin_get_child(GTK_BIN(botao3));
+    if(GTK_IS_BIN(botao3))
+    {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao3));
         gdk_color_parse ("green", &color1);
         gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
     }
