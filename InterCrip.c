@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #define max 100000
+
+// Global
 FILE *out;
 FILE *out1;
 FILE *out2;
@@ -14,6 +16,8 @@ GtkWidget *text;
 GtkWidget *text3;
 GtkWidget *label1;
 GtkWidget *label2;
+GdkColor color;
+GdkColor color1;
 
 long long int phi=0;
 long long int num_m[max];
@@ -25,15 +29,17 @@ long long int npublickey;
 char cripto[max];
 const char *realtext;
 
-void converttolongint(char *line)
+//Global
+
+void converttolongint(char *str)
 {
     long long int num, i = 0;
-    int leng;
-    while ( sscanf( line, "%Ld%n", &num, &leng) == 1 )
+    int l;
+    while(sscanf(str, "%Ld%n", &num, &l) == 1)
     {
 	    num_m[i]=num;
-	    line += leng;    // step past the number we found
-	    i++;            // increment our count of the number of values found
+	    str+=l;
+	    i++;
     }
 }
 int inverso(long long int ex)
@@ -44,12 +50,12 @@ int inverso(long long int ex)
 		if((ex*x)%phi==1) return x;
 	}
 }
-char *strdup (const char *s) 
+char *converttostring(const char *s) 
 {
-    char *rt = malloc (strlen (s) + 1);   // Space for length plus nul
-    if (rt == NULL) return NULL;          // No memory
-    strcpy (rt,s);                       // Copy the characters
-    return rt;                            // Return the new string
+    char *rt = malloc (strlen (s) + 1);
+    if (rt == NULL) return NULL;
+    strcpy (rt,s);
+    return rt;
 }
 long long int fastexpmod(long long int a,long long int x,long long int m1)
 {
@@ -104,7 +110,7 @@ long long int primo(long long int a,long long int b)
 void criptografar(GtkWidget *widget,gpointer data)
 {
 	long long int numeric_m[max];
-	rt = strdup(gtk_entry_get_text(GTK_ENTRY(text)));
+	rt = converttostring(gtk_entry_get_text(GTK_ENTRY(text)));
 	strcpy(cripto,rt);
 	len = strlen(cripto);
 	for(inde=0;inde<len;inde++)
@@ -131,7 +137,6 @@ void wcriptografar(GtkWidget *widget,gpointer data)
 	GtkWidget *label;
 	GtkWidget * button;
 
-
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window),100);
 	gtk_window_set_title(GTK_WINDOW(window),"Criptografia");
@@ -150,6 +155,15 @@ void wcriptografar(GtkWidget *widget,gpointer data)
 
 	label1 = gtk_label_new("waiting...");
 	gtk_box_pack_start(GTK_BOX(boxv1),label1,FALSE,FALSE,0);
+
+	gdk_color_parse ("black", &color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
+
+	gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label1, GTK_STATE_NORMAL, &color1);
 	
 	gtk_widget_show_all(window);
 }
@@ -158,7 +172,7 @@ void gogo(GtkWidget *widget,gpointer data)
 	char letter1,msg[max],n_m[max];
 	char *numc;
 
-	numc = strdup(gtk_entry_get_text(GTK_ENTRY(text3)));
+	numc = converttostring(gtk_entry_get_text(GTK_ENTRY(text3)));
 	strcpy(n_m,numc);
 
 	if(countlen == 0)
@@ -166,7 +180,6 @@ void gogo(GtkWidget *widget,gpointer data)
 		len = strlen(n_m);
 		len = len/3;
 	}
-	printf("%lld\n",len);
 	for(inde=0;inde < len;inde++)
 	{
 		converttolongint(numc);
@@ -181,6 +194,7 @@ void gogo(GtkWidget *widget,gpointer data)
 	out2 = fopen("descriptografado.txt","a");
 	fprintf(out2,"%s",numc);
 	fclose(out2);
+
 	char text1[100] = "Descriptografado!!";
 	gtk_label_set_text(GTK_LABEL(label2),text1);
 }
@@ -189,6 +203,7 @@ void descriptografar(GtkWidget *widget,gpointer data)
 	GtkWidget *window;
 	GtkWidget *boxv1;
 	GtkWidget *button;
+	GtkWidget *label;
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window),100);
@@ -197,8 +212,8 @@ void descriptografar(GtkWidget *widget,gpointer data)
 	boxv1 = gtk_vbox_new(FALSE,0);
 	gtk_container_add(GTK_CONTAINER(window),boxv1);
 
-	label2 = gtk_label_new("Now, tell the message encrypted:");
-	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
+	label = gtk_label_new("Now, tell the message encrypted:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
 
 	text3 = gtk_entry_new();
 	gtk_entry_set_max_length(GTK_ENTRY(text3),1000000);
@@ -207,8 +222,16 @@ void descriptografar(GtkWidget *widget,gpointer data)
 	label2 = gtk_label_new("waiting...");
 	g_signal_connect(text3,"activate",G_CALLBACK(gogo),text3);
 	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
+
+	gdk_color_parse ("black", &color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
 	
-	
+	gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label2, GTK_STATE_NORMAL, &color1);
+
 	gtk_widget_show_all(window);
 }
 int firstnumbern(GtkButton *button, gpointer data)
@@ -263,6 +286,7 @@ void gerar_chave_publica()
 	GtkWidget *label1;
 	GtkWidget *label2;
 	GtkWidget * button;
+
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window),100);
 	gtk_window_set_title(GTK_WINDOW(window),"Chave Pública");
@@ -277,8 +301,8 @@ void gerar_chave_publica()
 	gtk_entry_set_max_length(GTK_ENTRY(p),10);
 	gtk_box_pack_start(GTK_BOX(boxv1),p,FALSE,FALSE,0);
 
-	label = gtk_label_new("Enter a prime number Q:");
-	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
+	label1 = gtk_label_new("Enter a prime number Q:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label1,FALSE,FALSE,0);
 
 	q = gtk_entry_new();
 	gtk_entry_set_max_length(GTK_ENTRY(q),10);
@@ -298,6 +322,29 @@ void gerar_chave_publica()
 	label_out = gtk_label_new("Waiting...");
 	gtk_box_pack_start(GTK_BOX(boxv1),label_out,FALSE,FALSE,0);
 
+	gdk_color_parse ("black",&color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
+
+	gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label,GTK_STATE_NORMAL,&color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label1, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label2, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label_out, GTK_STATE_NORMAL, &color1);
+
+    if(GTK_IS_BIN(button))
+    {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(button));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg(children,GTK_STATE_NORMAL,&color1);
+    }
+
+
 	gtk_widget_show_all(window);
 }
 int main(int argc, char *argv[])
@@ -305,10 +352,10 @@ int main(int argc, char *argv[])
 {
 	GtkWidget *window;
 	GtkWidget *botao1;
-	GtkWidget *label;
-	GtkWidget *boxv1;
 	GtkWidget *botao2;
 	GtkWidget *botao3;
+	GtkWidget *label;
+	GtkWidget *boxv1;
 
 	gtk_init(&argc,&argv);
 
@@ -334,6 +381,30 @@ int main(int argc, char *argv[])
 	botao3 = gtk_button_new_with_label("Descriptografar");
 	g_signal_connect(G_OBJECT(botao3),"clicked",G_CALLBACK(descriptografar),NULL);
 	gtk_box_pack_start(GTK_BOX(boxv1),botao3,FALSE,FALSE,0);
+
+	gdk_color_parse ("black", &color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
+
+    if(GTK_IS_BIN(botao1)) {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao1));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
+    }
+
+    if(GTK_IS_BIN(botao2)) {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao2));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
+    }
+
+    if(GTK_IS_BIN(botao3)) {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao3));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
+    }
 
 	gtk_widget_show_all(window);
 
