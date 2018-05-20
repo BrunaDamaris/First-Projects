@@ -1,109 +1,410 @@
+#include <gtk/gtk.h>
 #include <stdio.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
-#include <netdb.h>
 #include <stdlib.h>
-#include <strings.h> // coloquei pra bzero
-#include <unistd.h>
 #include <string.h>
-#define SA struct sockaddr
-int indice = 0;
+#define max 100000
+FILE *out;
+FILE *out1;
+FILE *out2;
+GtkWidget *p;
+GtkWidget *q;
+GtkWidget *e;
+GtkWidget *label_out;
+GtkWidget *text;
+GtkWidget *text3;
+GtkWidget *label1;
+GtkWidget *label2;
+GdkColor color;
+GdkColor color1;
 
-struct cliente// struct padrão de cliente com endereço variavel de connfd que guarda meu sochet
+long long int phi=0;
+long long int num_m[max];
+long long int dnumber;
+long long int len,inde,letter,countlen=0;
+char *rt;
+long long int enumber;
+long long int npublickey;
+char cripto[max];
+const char *realtext;
+
+void converttolongint(char *line)
 {
-	struct sockaddr_in addr;
-	int connfd; // descritor do arquivo de conexão
-	char nome[50];
-};
-struct cliente clientes[100];
-// fiz a echo só pra rodar mesmo mas por enquanto ela não faz nada sem o cliente então ignorem,precisamos saber mais sobre a mesma
-// COMENTÁRIO EM MAIUSCULO SÃO COISAS QUE EU JULGUEI SEREM INTERESSANTES DE RESSALTAR.DEPOIS EU ORGANIZO.
-void str_echo(int sockfd,char vc[])
+    long long int num, i = 0;
+    int leng;
+    while ( sscanf( line, "%Ld%n", &num, &leng) == 1 )
+    {
+	    num_m[i]=num;
+	    line += leng;    // step past the number we found
+	    i++;            // increment our count of the number of values found
+    }
+}
+int inverso(long long int ex)
 {
-	ssize_t n;
-	char buf[4096];
-	while(strcmp(buf, "xau") != 0)
+	long long int x;
+	for(x=1;x<=phi;x++)
 	{
-		//printf("Mensgam recebida : %s \n", buf);
-		//fgets(buf, 4096, stdin);
-		printf("aguardando mensagem ...\n");
-		//printf("%d", sockfd);
-		read(sockfd,buf,4096);// le oque ele escreve
-		printf("Mensagem recebida : <%s>%s\n", vc,buf);
-
-		printf("Digite uma mensagem : ");
-
-		fgets(buf, 4096, stdin);
-
-		write(sockfd,buf,50);
-
-		printf("Mensagem enviada : %s\n", buf);
+		if((ex*x)%phi==1) return x;
 	}
 }
-
-int main()
+char *strdup (const char *s) 
 {
- 	int meusocket, resposta_server, a=0,i;
- 	pid_t  criacao_filhos;
- 	char buff[50];
- 	socklen_t tamanho_cliente;//coloquei o socklen aqui, QUE TEM PELO MENOS 32 BITS,TAMANHO DE ALGUMA COISA,NO CASO ELE ENTRA NO ACCEPT ENTÃO É DO ENDEREÇO
- 	struct sockaddr_in cliaddr, servaddr;// CRIAÇÃO DA VARIÁVEL TIPO STRUCT
- 	
+    char *rt = malloc (strlen (s) + 1);   // Space for length plus nul
+    if (rt == NULL) return NULL;          // No memory
+    strcpy (rt,s);                       // Copy the characters
+    return rt;                            // Return the new string
+}
+long long int fastexpmod(long long int a,long long int x,long long int m1)
+{
+    if(x==0) return 1;
+    else if(x%2==0)
+    {
+    	long long int x1 = fastexpmod(a,x/2,m1);
+    	return (x1*x1)%m1; 
+    }
+    else return(a%m1*fastexpmod(a,x-1,m1))%m1;
+}
+//euclides function says if the number E and (p-1)(q-1) are co-prime, if x= 1, so they are
+//else, function reads another number E and send again to euclides
+long long int euclides(long long int x, long long int phi)
+{
+    if(phi==0)
+    {
+       return x;
+    }
+    return euclides(phi, x%phi);
+}
+long long int primo(long long int a,long long int b)
+{
+	long long int d;
+	int achei= 0, achei2=0;
+	for(d=2; d*d<=a && !achei;d++)
+	{
+		if(a%d==0)
+		{
+			achei = 1;
+			break;
+		}
+	}
+	for(d=2; d*d<=b && !achei2;d++)
+	{
+		if(b%d==0)
+		{
+			achei2 = 1;
+			break;
+		}
+	}
+	if(!achei && !achei2)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 
- 	meusocket = socket(AF_INET, SOCK_STREAM, 0);
- 	bzero(&servaddr, sizeof(servaddr));
- 	servaddr.sin_family = AF_INET;
- 	servaddr.sin_addr.s_addr = htonl(0);// DIZ NO LIVRO QUE PODE SER QUALQUER VALOR AQUI QUE NORMALMENTE É A CONSTANTE NUMERICA 0  
- 	servaddr.sin_port = htons(9503);//HTONS E HTONL RETORNAM O VALOR NA ORDEM DE BYTES DA REDE.
+}
+void criptografar(GtkWidget *widget,gpointer data)
+{
+	long long int numeric_m[max];
+	rt = strdup(gtk_entry_get_text(GTK_ENTRY(text)));
+	strcpy(cripto,rt);
+	len = strlen(cripto);
+	for(inde=0;inde<len;inde++)
+	{
+		letter = cripto[inde];
+		numeric_m[inde] = letter;
+	}
+	for(inde=0;inde<len;inde++)
+	{
+		out1 = fopen("criptografado.txt","a+");
+		numeric_m[inde] = fastexpmod(numeric_m[inde],enumber,npublickey);
+		fprintf(out1,"%Ld ",numeric_m[inde]);
+		fclose(out1);
+	}
+	countlen++;
 
- 	bind(meusocket, (SA*)&servaddr, sizeof(servaddr));
-	// bind(): QUANDO UM SOCKET É CRIADO,ELE TEM UM NOME(ENDEREÇO DA FAMILIA/PROTOCOLO DA FAMILIA) PORÉM ELE NÃO TEM UM ENDEREÇO.
-	//BIND VAI FAZER COM QUE SEJA DESIGNADO UM ENDEREÇO LOCAL( OU PORTA LOCAL) PARA ESSE SOCKET ESPECIFICADO PELO ADDR REFERENTE PELO DESCRITOR(QUE FOI CRIADO PELO AF_INET,QUE DEVER O SOCKFD??) DO ARQUIVO.
-	//O BIND DEVE SER EXECUTADO ANTES DE QUALQUER CONEXÃO DO CLIENTE COM O SERVIDOR,PORQUE AÍ O SERV VAI TER UM ENDEREÇO,SÓ ENTÃO ELE DEVE ACEITAR CONEXÕES.
-	//É O BIND QUE VAI VER SE A PORTA JÁ ESTÁ SENDO USADA POR OUTRO PROCESSO.
-	// BASICAMENTE, O PAPEL DO BIND É DESIGNAR UM ENDEREÇO AO SOCKET PARA O CLIENTE PODER USAR O MESMO PARA SE CONECTAR AO SERVIDOR.É USADO PRA DEFINIR O PONTO FINAL DA COMUNICAÇÃO(ACHO QUE ONDE A COMUNICAÇÃO VAI OCORRER??).
- 	
- 	listen(meusocket, 1024);
+	char text1[100] = "Criptografado!!";
+	gtk_label_set_text(GTK_LABEL(label1),text1);
+}
+void wcriptografar(GtkWidget *widget,gpointer data)
+{
+	GtkWidget *window;
+	GtkWidget *boxv1;
+	GtkWidget *label;
+	GtkWidget * button;
 
- 	
-  	for(;;)
- 	{
- 		printf("aguardando cliente\n");
- 		tamanho_cliente = sizeof(cliaddr);
- 		resposta_server = accept( meusocket,(SA*)&cliaddr, &tamanho_cliente);
- 		if((criacao_filhos = fork()) == 0)
- 		{
- 			close(meusocket);
- 		
- 			clientes[indice].addr = cliaddr; // guarda endereço do cliente num struct
- 		
- 			clientes[indice].connfd = meusocket; // guarda variavel de retorno da criação do socket no struct
-			
-			//	indice++;
- 			
- 			read(resposta_server,buff,4096); // le o nome do usuario
- 		
- 			write(resposta_server,buff,4096); // envia o nome do usuario
- 
- 			for(i=0;i < strlen(buff);i++)
- 			{
- 				clientes[indice].nome[i] = buff[i]; // guarda o nome no buff
- 			}
- 			printf("%s!!!!!!\n",clientes[indice].nome);
- 			indice++;
- 			
- 			printf("Cliente conectado com sucesso! %s seu identificador eh %d\n", buff, indice);
- 			str_echo(resposta_server,buff);
- 			exit(0);
- 		}
- 		else
- 		{
- 			printf("falha no fork!");
- 		}
- 		close(resposta_server);
- 	}
- 	// acho que tá tudo direitinho...
-	// acho que o programa cai no loop quando executado.
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_container_set_border_width(GTK_CONTAINER(window),100);
+	gtk_window_set_title(GTK_WINDOW(window),"Criptografia");
+
+	boxv1 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(window),boxv1);
+
+	label = gtk_label_new("Type something!!:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
+
+	text = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(text),100000);
+	gtk_box_pack_start(GTK_BOX(boxv1),text,FALSE,FALSE,0);
+
+	g_signal_connect(text,"activate",G_CALLBACK(criptografar),text);
+
+	label1 = gtk_label_new("waiting...");
+	gtk_box_pack_start(GTK_BOX(boxv1),label1,FALSE,FALSE,0);
+
+	gdk_color_parse ("black", &color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
+
+	gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label1, GTK_STATE_NORMAL, &color1);
+	
+	gtk_widget_show_all(window);
+}
+void gogo(GtkWidget *widget,gpointer data)
+{
+	char letter1,msg[max],n_m[max];
+	char *numc;
+
+	numc = strdup(gtk_entry_get_text(GTK_ENTRY(text3)));
+	strcpy(n_m,numc);
+
+	if(countlen == 0)
+	{
+		len = strlen(n_m);
+		len = len/3;
+	}
+	for(inde=0;inde < len;inde++)
+	{
+		converttolongint(numc);
+	}
+	for(inde=0;inde < len;inde++)
+	{
+		num_m[inde] = fastexpmod(num_m[inde],dnumber,npublickey);
+		letter1 = num_m[inde];
+		msg[inde] = letter1;
+	}
+	strcpy(numc,msg);
+	out2 = fopen("descriptografado.txt","a");
+	fprintf(out2,"%s",numc);
+	fclose(out2);
+
+	char text1[100] = "Descriptografado!!";
+	gtk_label_set_text(GTK_LABEL(label2),text1);
+}
+void descriptografar(GtkWidget *widget,gpointer data)
+{
+	GtkWidget *window;
+	GtkWidget *boxv1;
+	GtkWidget *button;
+	GtkWidget *label;
+
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_container_set_border_width(GTK_CONTAINER(window),100);
+	gtk_window_set_title(GTK_WINDOW(window),"Descrypt");
+
+	boxv1 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(window),boxv1);
+
+	label = gtk_label_new("Now, tell the message encrypted:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
+
+	text3 = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(text3),1000000);
+	gtk_box_pack_start(GTK_BOX(boxv1),text3,FALSE,FALSE,0);
+
+	label2 = gtk_label_new("waiting...");
+	g_signal_connect(text3,"activate",G_CALLBACK(gogo),text3);
+	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
+
+	gdk_color_parse ("black", &color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
+	
+	gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label2, GTK_STATE_NORMAL, &color1);
+
+	gtk_widget_show_all(window);
+}
+int firstnumbern(GtkButton *button, gpointer data)
+{
+	long long int firstnumber=0,secondnumber=0,m=0,validate=0;
+
+	firstnumber=atol(gtk_entry_get_text(GTK_ENTRY(p)));
+
+	secondnumber=atol(gtk_entry_get_text(GTK_ENTRY(q)));
+
+	npublickey=firstnumber*secondnumber;
+
+	phi = (firstnumber-1)*(secondnumber-1);
+
+	while(m!=1)
+	{ 
+		enumber=atol(gtk_entry_get_text(GTK_ENTRY(e)));
+		m = euclides(enumber,phi);
+		if(m==1)
+		{
+			dnumber = inverso(enumber);
+			validate++;
+			break;
+		}
+		else
+		{ 
+			printf("Didn't work\n");
+			break;
+		}
+	}
+	if(npublickey && (primo(firstnumber,secondnumber) != 0) && validate != 0)
+	{
+		char text2[100] = "Valid numbers!\n";
+		gtk_label_set_text(GTK_LABEL(label_out),text2);
+		out = fopen("chave_publica.txt","w+");
+		fprintf(out,"N: %Ld E: %Ld\n",npublickey,enumber); 
+		fclose(out);
+		
+	}
+	else
+	{
+		char text1[100] = "Invalid number!!!\n";
+		gtk_label_set_text(GTK_LABEL(label_out),text1);
+	}
+	
+}
+void gerar_chave_publica()
+{
+	GtkWidget *window;
+	GtkWidget *boxv1;
+	GtkWidget *label;
+	GtkWidget *label1;
+	GtkWidget *label2;
+	GtkWidget * button;
+
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_container_set_border_width(GTK_CONTAINER(window),100);
+	gtk_window_set_title(GTK_WINDOW(window),"Chave Pública");
+
+	boxv1 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(window),boxv1);
+
+	label = gtk_label_new("Enter a prime number P:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
+
+	p = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(p),10);
+	gtk_box_pack_start(GTK_BOX(boxv1),p,FALSE,FALSE,0);
+
+	label1 = gtk_label_new("Enter a prime number Q:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label1,FALSE,FALSE,0);
+
+	q = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(q),10);
+	gtk_box_pack_start(GTK_BOX(boxv1),q,FALSE,FALSE,0);
+
+	label2 = gtk_label_new("Enter a number that will be E:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
+
+	e = gtk_entry_new();
+	gtk_entry_set_max_length(GTK_ENTRY(e),10);
+	gtk_box_pack_start(GTK_BOX(boxv1),e,FALSE,FALSE,0);
+
+	button = gtk_button_new_with_label("Go!");
+	gtk_box_pack_start(GTK_BOX(boxv1),button,FALSE,FALSE,0);
+	g_signal_connect(G_OBJECT(button), "clicked",G_CALLBACK(firstnumbern), NULL);
+
+	label_out = gtk_label_new("Waiting...");
+	gtk_box_pack_start(GTK_BOX(boxv1),label_out,FALSE,FALSE,0);
+
+	gdk_color_parse ("black", &color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
+
+	gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label,GTK_STATE_NORMAL,&color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label1, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label2, GTK_STATE_NORMAL, &color1);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label_out, GTK_STATE_NORMAL, &color1);
+
+    if(GTK_IS_BIN(button))
+    {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(button));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg(children,GTK_STATE_NORMAL,&color1);
+    }
+
+
+	gtk_widget_show_all(window);
+}
+int main(int argc, char *argv[])
+
+{
+	GtkWidget *window;
+	GtkWidget *botao1;
+	GtkWidget *botao2;
+	GtkWidget *botao3;
+	GtkWidget *label;
+	GtkWidget *boxv1;
+
+	gtk_init(&argc,&argv);
+
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	g_signal_connect(G_OBJECT(window),"destroy",G_CALLBACK(gtk_main_quit),NULL);
+	gtk_container_set_border_width(GTK_CONTAINER(window),200);
+	gtk_window_set_title(GTK_WINDOW(window),"RSA");
+
+	boxv1 = gtk_vbox_new(FALSE,0);
+	gtk_container_add(GTK_CONTAINER(window),boxv1);
+
+	label = gtk_label_new("Select an option:");
+	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
+
+	botao1 = gtk_button_new_with_label("Gerar chave pública");
+	g_signal_connect(G_OBJECT (botao1),"clicked",G_CALLBACK(gerar_chave_publica),NULL);
+	gtk_box_pack_start(GTK_BOX(boxv1),botao1,FALSE,FALSE,0);
+
+	botao2 = gtk_button_new_with_label("Criptografar");
+	g_signal_connect(G_OBJECT (botao2),"clicked",G_CALLBACK(wcriptografar),NULL);// função
+	gtk_box_pack_start(GTK_BOX(boxv1),botao2,FALSE,FALSE,0);
+
+	botao3 = gtk_button_new_with_label("Descriptografar");
+	g_signal_connect(G_OBJECT(botao3),"clicked",G_CALLBACK(descriptografar),NULL);
+	gtk_box_pack_start(GTK_BOX(boxv1),botao3,FALSE,FALSE,0);
+
+	gdk_color_parse ("black", &color);
+	gtk_widget_modify_bg( GTK_WIDGET(window), GTK_STATE_NORMAL, &color);
+
+    gdk_color_parse ("lime", &color1);
+    gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
+
+    if(GTK_IS_BIN(botao1)) {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao1));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
+    }
+
+    if(GTK_IS_BIN(botao2)) {
+        GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao2));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
+    }
+
+    if(GTK_IS_BIN(botao3)) {
+        GtkWidget *child = gtk_bin_get_child(GTK_BIN(botao3));
+        gdk_color_parse ("green", &color1);
+        gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
+    }
+
+	gtk_widget_show_all(window);
+
+	gtk_main();
+
 	return 0;
 }
