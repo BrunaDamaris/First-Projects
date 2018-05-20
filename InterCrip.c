@@ -11,24 +11,37 @@ GtkWidget *q;
 GtkWidget *e;
 GtkWidget *label_out;
 GtkWidget *text;
+GtkWidget *text3;
 GtkWidget *label1;
 GtkWidget *label2;
 
-long int dnumber;
-long int option,len,inde,letter,numeric_m[max];
+long long int phi=0;
+long long int num_m[max];
+long long int dnumber;
+long long int len,inde,letter,countlen=0;
 char *rt;
-long int enumber;
-long int npublickey;
+long long int enumber;
+long long int npublickey;
 char cripto[max];
 const char *realtext;
 
-
-int inverso(int e,int phi)
+void converttolongint(char *line)
 {
-	int x;
+    long long int num, i = 0;
+    int leng;
+    while ( sscanf( line, "%Ld%n", &num, &leng) == 1 )
+    {
+	    num_m[i]=num;
+	    line += leng;    // step past the number we found
+	    i++;            // increment our count of the number of values found
+    }
+}
+int inverso(long long int ex)
+{
+	long long int x;
 	for(x=1;x<=phi;x++)
 	{
-		if((e*x)%phi==1) return x;
+		if((ex*x)%phi==1) return x;
 	}
 }
 char *strdup (const char *s) 
@@ -38,19 +51,19 @@ char *strdup (const char *s)
     strcpy (rt,s);                       // Copy the characters
     return rt;                            // Return the new string
 }
-int fastexpmod (int m2, int ex, int n2)
+long long int fastexpmod(long long int a,long long int x,long long int m1)
 {
-    if(ex==0) return 1;
-    else if(ex%2==0)
+    if(x==0) return 1;
+    else if(x%2==0)
     {
-    	int x = fastexpmod(m2,ex/2,n2);
-    	return (x*x)%n2; 
+    	long long int x1 = fastexpmod(a,x/2,m1);
+    	return (x1*x1)%m1; 
     }
-    else return(m2%n2*fastexpmod(m2,ex-1,n2))%n2;
+    else return(a%m1*fastexpmod(a,x-1,m1))%m1;
 }
 //euclides function says if the number E and (p-1)(q-1) are co-prime, if x= 1, so they are
 //else, function reads another number E and send again to euclides
-int euclides(int x, int phi)
+long long int euclides(long long int x, long long int phi)
 {
     if(phi==0)
     {
@@ -58,9 +71,9 @@ int euclides(int x, int phi)
     }
     return euclides(phi, x%phi);
 }
-int primo(long int a, long int b)
+long long int primo(long long int a,long long int b)
 {
-	long int d;
+	long long int d;
 	int achei= 0, achei2=0;
 	for(d=2; d*d<=a && !achei;d++)
 	{
@@ -90,7 +103,7 @@ int primo(long int a, long int b)
 }
 void criptografar(GtkWidget *widget,gpointer data)
 {
-
+	long long int numeric_m[max];
 	rt = strdup(gtk_entry_get_text(GTK_ENTRY(text)));
 	strcpy(cripto,rt);
 	len = strlen(cripto);
@@ -99,17 +112,14 @@ void criptografar(GtkWidget *widget,gpointer data)
 		letter = cripto[inde];
 		numeric_m[inde] = letter;
 	}
-	printf("Your message converted to decimal ASCII TABLE:\n");
 	for(inde=0;inde<len;inde++)
 	{
 		out1 = fopen("criptografado.txt","a+");
-		printf("%ld ",numeric_m[inde]);
 		numeric_m[inde] = fastexpmod(numeric_m[inde],enumber,npublickey);
-		fprintf(out1,"%ld ",numeric_m[inde]);
+		fprintf(out1,"%Ld ",numeric_m[inde]);
 		fclose(out1);
 	}
-	printf("\n");
-	printf("Your message:");
+	countlen++;
 
 	char text1[100] = "Criptografado!!";
 	gtk_label_set_text(GTK_LABEL(label1),text1);
@@ -133,7 +143,7 @@ void wcriptografar(GtkWidget *widget,gpointer data)
 	gtk_box_pack_start(GTK_BOX(boxv1),label,FALSE,FALSE,0);
 
 	text = gtk_entry_new();
-	gtk_entry_set_max_length(GTK_ENTRY(text),100);
+	gtk_entry_set_max_length(GTK_ENTRY(text),100000);
 	gtk_box_pack_start(GTK_BOX(boxv1),text,FALSE,FALSE,0);
 
 	g_signal_connect(text,"activate",G_CALLBACK(criptografar),text);
@@ -145,16 +155,40 @@ void wcriptografar(GtkWidget *widget,gpointer data)
 }
 void gogo(GtkWidget *widget,gpointer data)
 {
+	char letter1,msg[max],n_m[max];
+	char *numc;
+
+	numc = strdup(gtk_entry_get_text(GTK_ENTRY(text3)));
+	strcpy(n_m,numc);
+
+	if(countlen == 0)
+	{
+		len = strlen(n_m);
+		len = len/3;
+	}
+	printf("%lld\n",len);
+	for(inde=0;inde < len;inde++)
+	{
+		converttolongint(numc);
+	}
+	for(inde=0;inde < len;inde++)
+	{
+		num_m[inde] = fastexpmod(num_m[inde],dnumber,npublickey);
+		letter1 = num_m[inde];
+		msg[inde] = letter1;
+	}
+	strcpy(numc,msg);
+	out2 = fopen("descriptografado.txt","a");
+	fprintf(out2,"%s",numc);
+	fclose(out2);
 	char text1[100] = "Descriptografado!!";
 	gtk_label_set_text(GTK_LABEL(label2),text1);
 }
 void descriptografar(GtkWidget *widget,gpointer data)
 {
-	char letter1,msg[10000];
 	GtkWidget *window;
 	GtkWidget *boxv1;
 	GtkWidget *button;
-	GtkWidget *text3;
 
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(window),100);
@@ -167,36 +201,19 @@ void descriptografar(GtkWidget *widget,gpointer data)
 	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
 
 	text3 = gtk_entry_new();
-	gtk_entry_set_max_length(GTK_ENTRY(text3),100);
+	gtk_entry_set_max_length(GTK_ENTRY(text3),1000000);
 	gtk_box_pack_start(GTK_BOX(boxv1),text3,FALSE,FALSE,0);
 
-	for(inde=0;inde<len;inde++)
-	{
-		out2 = fopen("descriptografado.txt","a+");
-		numeric_m[inde]= fastexpmod(numeric_m[inde],dnumber,npublickey);
-		printf("%ld\n",numeric_m[inde]);
-		letter1 = numeric_m[inde];
-		msg[inde] = letter1;
-		fprintf(out2,"%c ",msg[inde]);
-		printf("%c ",msg[inde]);
-		fclose(out2);
-		
-	}
 	label2 = gtk_label_new("waiting...");
 	g_signal_connect(text3,"activate",G_CALLBACK(gogo),text3);
 	gtk_box_pack_start(GTK_BOX(boxv1),label2,FALSE,FALSE,0);
 	
 	
 	gtk_widget_show_all(window);
-
-
-
 }
-
-
 int firstnumbern(GtkButton *button, gpointer data)
 {
-	long int firstnumber=0,secondnumber=0,phi=0,m=0,validate=0;
+	long long int firstnumber=0,secondnumber=0,m=0,validate=0;
 
 	firstnumber=atol(gtk_entry_get_text(GTK_ENTRY(p)));
 
@@ -206,13 +223,13 @@ int firstnumbern(GtkButton *button, gpointer data)
 
 	phi = (firstnumber-1)*(secondnumber-1);
 
-	dnumber = inverso(enumber,phi);
 	while(m!=1)
 	{ 
 		enumber=atol(gtk_entry_get_text(GTK_ENTRY(e)));
 		m = euclides(enumber,phi);
 		if(m==1)
 		{
+			dnumber = inverso(enumber);
 			validate++;
 			break;
 		}
@@ -224,16 +241,16 @@ int firstnumbern(GtkButton *button, gpointer data)
 	}
 	if(npublickey && (primo(firstnumber,secondnumber) != 0) && validate != 0)
 	{
-		char text[100] = "Valid numbers!";
-		gtk_label_set_text(GTK_LABEL(label_out),text);
+		char text2[100] = "Valid numbers!\n";
+		gtk_label_set_text(GTK_LABEL(label_out),text2);
 		out = fopen("chave_publica.txt","w+");
-		fprintf(out,"N: %ld E: %ld\n",npublickey,enumber); 
+		fprintf(out,"N: %Ld E: %Ld\n",npublickey,enumber); 
 		fclose(out);
 		
 	}
-	else if(validate == 0)
+	else
 	{
-		char text1[100] = "Invalid number!!!\nHint: Enter a prime number next to a multiple of (p-1)*(q-1)\n";
+		char text1[100] = "Invalid number!!!\n";
 		gtk_label_set_text(GTK_LABEL(label_out),text1);
 	}
 	
@@ -276,7 +293,7 @@ void gerar_chave_publica()
 
 	button = gtk_button_new_with_label("Go!");
 	gtk_box_pack_start(GTK_BOX(boxv1),button,FALSE,FALSE,0);
-	g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(firstnumbern), NULL);
+	g_signal_connect(G_OBJECT(button), "clicked",G_CALLBACK(firstnumbern), NULL);
 
 	label_out = gtk_label_new("Waiting...");
 	gtk_box_pack_start(GTK_BOX(boxv1),label_out,FALSE,FALSE,0);
@@ -324,43 +341,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-/*
-if(option==1)
-			{
-			printf("Now, you have to write the message you want to encrypt.\n");
-			scanf(" %[^\n]s", message);
-			len= strlen(message);
-			for(index=0;index<len;index++)
-			{
-				letter = message[index];
-				numeric_m[index] = letter;
-			}
-			printf("Your message converted to decimal ASCII TABLE:\n");
-			for(index=0;index<len;index++)
-			{
-		  		printf("%ld ", numeric_m[index]);
-		  		numeric_m[index]= fastexpmod(numeric_m[index], e, n);
-			}
-			printf("\n");
-			printf("Your message encrypted is:\n");
-			for(index=0;index<len;index++)
-			{
-		 		 if(index==len-1) printf("%ld\n", numeric_m[index]);
-		 		 else printf("%ld#", numeric_m[index]);
-			}
-			printf("Your message decrypted is:\n");
-			for(index=0;index<len;index++)
-			{
-		 		 numeric_m[index]= fastexpmod(numeric_m[index], pkd, n);
-		 		 printf("%ld#", numeric_m[index]);
-			}
-			printf("\n");
-			for(index=0;index<len;index++)
-			{
-		 		 letter = numeric_m[index];
-		 		 message[index] = letter;
-		 		 printf("%c", message[index]);
-			}
-			printf("\n");
-			}
-			*/
