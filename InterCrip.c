@@ -27,7 +27,7 @@ long long int npublickey;
 long long int phi=0;
 long long int num_m[max];
 long long int dnumber;
-long int len,inde,letter,countlen=0,l=0;
+long int len,inde,letter,countlen=0;
 char *rt;
 char cripto[max];
 const char *realtext;
@@ -45,14 +45,6 @@ void converttolongint(char *str)
 	    i++;
     }
 }
-int inverso(long long int ex)
-{
-	long long int x;
-	for(x=1;x<=phi;x++)
-	{
-		if((ex*x)%phi==1) return x;
-	}
-}
 char *converttostring(const char *s) 
 {
     char *rt = malloc (strlen (s) + 1);
@@ -60,12 +52,20 @@ char *converttostring(const char *s)
     strcpy (rt,s);
     return rt;
 }
+long long int inverso(long long int ex)
+{
+	long long int x;
+	for(x=1;x<=phi;x++)
+	{
+		if((ex*x)%phi==1) return x;
+	}
+}
 long long int fastexpmod(long long int a,long long int x,long long int m1)
 {
     if(x==0) return 1;
     else if(x%2==0)
     {
-    	long int x1 = fastexpmod(a,x/2,m1);
+    	long long int x1 = fastexpmod(a,x/2,m1);
     	return (x1*x1)%m1; 
     }
     else return(a%m1*fastexpmod(a,x-1,m1))%m1;
@@ -132,7 +132,7 @@ void criptografar(GtkWidget *widget,gpointer data)
 	{
 		out1 = fopen("criptografado.txt","a+");
 		numeric_m[inde] = fastexpmod(numeric_m[inde],enr,nkey);
-		fprintf(out1,"%Ld ",numeric_m[inde]);
+		fprintf(out1,"%lld ",numeric_m[inde]);
 		fclose(out1);
 	}
 	countlen++;
@@ -335,7 +335,7 @@ int firstnumbern(GtkButton *button, gpointer data)
 	}
 
 	out_d = fopen("Private Key.txt","a+");
-	fprintf(out_d,"%Ld",dnumber);
+	fprintf(out_d,"Key: %Ld\n",dnumber);
 	fclose(out_d);
 
 	if(npublickey && (primo(firstnumber,secondnumber) != 0) && validate != 0)
