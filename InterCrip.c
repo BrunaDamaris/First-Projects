@@ -27,7 +27,7 @@ long long int npublickey;
 long long int phi=0;
 long long int num_m[max];
 long long int dnumber;
-long long int len,inde,letter,countlen=0,l=0;
+long int len,inde,letter,countlen=0,l=0;
 char *rt;
 char cripto[max];
 const char *realtext;
@@ -113,10 +113,11 @@ long long int primo(long long int a,long long int b)
 void criptografar(GtkWidget *widget,gpointer data)
 {
 	long long int numeric_m[max];
-	
-	out_d = fopen("Private Key.txt","w+");
-	fprintf(out_d,"%Ld",dnumber);
-	fclose(out_d);
+	long long int enr,nkey;
+
+	nkey  = atol(gtk_entry_get_text(GTK_ENTRY(n)));
+
+	enr = atol(gtk_entry_get_text(GTK_ENTRY(en)));
 	
 	rt = converttostring(gtk_entry_get_text(GTK_ENTRY(text)));
 	strcpy(cripto,rt);
@@ -130,7 +131,7 @@ void criptografar(GtkWidget *widget,gpointer data)
 	for(inde=0;inde<len;inde++)
 	{
 		out1 = fopen("criptografado.txt","a+");
-		numeric_m[inde] = fastexpmod(numeric_m[inde],enumber,npublickey);
+		numeric_m[inde] = fastexpmod(numeric_m[inde],enr,nkey);
 		fprintf(out1,"%Ld ",numeric_m[inde]);
 		fclose(out1);
 	}
@@ -155,14 +156,14 @@ void wcriptografar(GtkWidget *widget,gpointer data)
 	boxv1 = gtk_vbox_new(FALSE,0);
 	gtk_container_add(GTK_CONTAINER(window),boxv1);
 
-	label_n = gtk_label_new("Type your public key(E):");
+	label_n = gtk_label_new("Type the user public key:");
 	gtk_box_pack_start(GTK_BOX(boxv1),label_n,FALSE,FALSE,0);
 
 	n = gtk_entry_new();
 	gtk_entry_set_max_length(GTK_ENTRY(n),10000);
 	gtk_box_pack_start(GTK_BOX(boxv1),n,FALSE,FALSE,0);
 
-	label_e = gtk_label_new("Type your public key(N):");
+	label_e = gtk_label_new("Type the user public key:");
 	gtk_box_pack_start(GTK_BOX(boxv1),label_e,FALSE,FALSE,0);
 
 	en = gtk_entry_new();
@@ -332,15 +333,16 @@ int firstnumbern(GtkButton *button, gpointer data)
 			break;
 		}
 	}
-	out_d = fopen("Private Key.txt","w+");
+
+	out_d = fopen("Private Key.txt","a+");
 	fprintf(out_d,"%Ld",dnumber);
 	fclose(out_d);
+
 	if(npublickey && (primo(firstnumber,secondnumber) != 0) && validate != 0)
 	{
 		char text2[100] = "Valid numbers!\n";
 		gtk_label_set_text(GTK_LABEL(label_out),text2);
-		out = fopen("chave_publica.txt","w+");
-		l++;
+		out = fopen("chave_publica.txt","a+");
 		fprintf(out,"N: %Ld E: %Ld\n",npublickey,enumber); 
 		fclose(out);
 		
