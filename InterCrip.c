@@ -34,6 +34,7 @@ const char *realtext;
 
 //Global
 
+// Conversion Functions
 void converttolongint(char *str)
 {
     long long int num, i = 0;
@@ -52,6 +53,9 @@ char *converttostring(const char *s)
     strcpy (rt,s);
     return rt;
 }
+// Conversion Functions.
+
+//Other Functions
 long long int inverso(long long int ex)
 {
 	long long int x;
@@ -110,6 +114,9 @@ long long int primo(long long int a,long long int b)
 	}
 
 }
+// Other Functions.
+
+//Encrypt Functions
 void criptografar(GtkWidget *widget,gpointer data)
 {
 	long long int numeric_m[max];
@@ -199,6 +206,9 @@ void wcriptografar(GtkWidget *widget,gpointer data)
 	
 	gtk_widget_show_all(window);
 }
+//Encrypt Functions.
+
+//Decrypt Functions
 void fromfile(GtkWidget *widget,gpointer data)
 {
 	char letter1,msg[max],n_m[max];
@@ -305,6 +315,9 @@ void descriptografar(GtkWidget *widget,gpointer data)
 
 	gtk_widget_show_all(window);
 }
+//Decrypt Functions.
+
+//Key Functions
 int firstnumbern(GtkButton *button, gpointer data)
 {
 	long long int firstnumber=0,secondnumber=0,m=0,validate=0;
@@ -423,6 +436,10 @@ void gerar_chave_publica()
 
 	gtk_widget_show_all(window);
 }
+
+//Key Functions.
+
+//Main
 int main(int argc, char *argv[])
 
 {
@@ -491,3 +508,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+//Main.
