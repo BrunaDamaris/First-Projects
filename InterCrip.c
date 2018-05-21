@@ -22,11 +22,11 @@ GtkWidget *label2;
 GdkColor color;
 GdkColor color1;
 
-long int enumber;
-long int npublickey;
-long int phi=0;
-long int num_m[max];
-long int dnumber;
+long long int enumber;
+long long int npublickey;
+long long int phi=0;
+long long int num_m[max];
+long long int dnumber;
 long int len,inde,letter,countlen=0,l=0;
 char *rt;
 char cripto[max];
@@ -36,18 +36,18 @@ const char *realtext;
 
 void converttolongint(char *str)
 {
-    long int num, i = 0;
+    long long int num, i = 0;
     int l;
-    while(sscanf(str, "%ld%n", &num, &l) == 1)
+    while(sscanf(str, "%Ld%n", &num, &l) == 1)
     {
 	    num_m[i]=num;
 	    str+=l;
 	    i++;
     }
 }
-int inverso(long int ex)
+int inverso(long long int ex)
 {
-	long int x;
+	long long int x;
 	for(x=1;x<=phi;x++)
 	{
 		if((ex*x)%phi==1) return x;
@@ -60,7 +60,7 @@ char *converttostring(const char *s)
     strcpy (rt,s);
     return rt;
 }
-long int fastexpmod(long int a,long int x,long int m1)
+long long int fastexpmod(long long int a,long long int x,long long int m1)
 {
     if(x==0) return 1;
     else if(x%2==0)
@@ -72,7 +72,7 @@ long int fastexpmod(long int a,long int x,long int m1)
 }
 //euclides function says if the number E and (p-1)(q-1) are co-prime, if x= 1, so they are
 //else, function reads another number E and send again to euclides
-long int euclides(long int x,long int phi)
+long long int euclides(long long int x,long long int phi)
 {
     if(phi==0)
     {
@@ -80,9 +80,9 @@ long int euclides(long int x,long int phi)
     }
     return euclides(phi, x%phi);
 }
-long int primo(long int a,long int b)
+long long int primo(long long int a,long long int b)
 {
-	long int d;
+	long long int d;
 	int achei= 0, achei2=0;
 	for(d=2; d*d<=a && !achei;d++)
 	{
@@ -112,10 +112,10 @@ long int primo(long int a,long int b)
 }
 void criptografar(GtkWidget *widget,gpointer data)
 {
-	long int numeric_m[max];
+	long long int numeric_m[max];
 	
 	out_d = fopen("Private Key.txt","w+");
-	fprintf(out_d,"%ld",dnumber);
+	fprintf(out_d,"%Ld",dnumber);
 	fclose(out_d);
 	
 	rt = converttostring(gtk_entry_get_text(GTK_ENTRY(text)));
@@ -131,7 +131,7 @@ void criptografar(GtkWidget *widget,gpointer data)
 	{
 		out1 = fopen("criptografado.txt","a+");
 		numeric_m[inde] = fastexpmod(numeric_m[inde],enumber,npublickey);
-		fprintf(out1,"%ld ",numeric_m[inde]);
+		fprintf(out1,"%Ld ",numeric_m[inde]);
 		fclose(out1);
 	}
 	countlen++;
@@ -203,26 +203,26 @@ void fromfile(GtkWidget *widget,gpointer data)
 	char letter1,msg[max],n_m[max];
 	char *numc;
 	FILE *f_in;
-	long int ind=0,i,letter;
+	long long int ind=0,i,letter;
 	f_in = fopen ("decrypted.txt", "r"); 
   	while (!feof (f_in)) 
   	{
-  		fscanf(f_in, "%ld", &num_m[ind]); 
+  		fscanf(f_in, "%Ld", &num_m[ind]); 
   		ind++;    
   	}
    	fclose (f_in);
-   	out2 = fopen("descriptografado.txt","a+");
+   	
    	for(i=0;i < ind;i++)
 	{
 		num_m[i] = fastexpmod(num_m[i],dnumber,npublickey);
 		letter = num_m[i];
 		msg[i] = letter;
-		if(i <= ind-1)
-		{
-			fprintf(out2,"%c",msg[i]);
-		}
 	}
+
+	out2 = fopen("descriptografado.txt","a+");
+	fprintf(out2,"%s",msg);
 	fclose(out2);
+
 	char text1[100] = "Descriptografado!!";
 	gtk_label_set_text(GTK_LABEL(label2),text1);
 }
@@ -306,7 +306,7 @@ void descriptografar(GtkWidget *widget,gpointer data)
 }
 int firstnumbern(GtkButton *button, gpointer data)
 {
-	long int firstnumber=0,secondnumber=0,m=0,validate=0;
+	long long int firstnumber=0,secondnumber=0,m=0,validate=0;
 
 	firstnumber = atol(gtk_entry_get_text(GTK_ENTRY(p)));
 
@@ -333,7 +333,7 @@ int firstnumbern(GtkButton *button, gpointer data)
 		}
 	}
 	out_d = fopen("Private Key.txt","w+");
-	fprintf(out_d,"%ld",dnumber);
+	fprintf(out_d,"%Ld",dnumber);
 	fclose(out_d);
 	if(npublickey && (primo(firstnumber,secondnumber) != 0) && validate != 0)
 	{
@@ -341,7 +341,7 @@ int firstnumbern(GtkButton *button, gpointer data)
 		gtk_label_set_text(GTK_LABEL(label_out),text2);
 		out = fopen("chave_publica.txt","w+");
 		l++;
-		fprintf(out,"N: %ld E: %ld\n",npublickey,enumber); 
+		fprintf(out,"N: %Ld E: %Ld\n",npublickey,enumber); 
 		fclose(out);
 		
 	}
@@ -462,14 +462,14 @@ int main(int argc, char *argv[])
     gdk_color_parse ("lime", &color1);
     gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &color1);
 
-    if(GTK_IS_BIN(botao1))
+    if(GTK_IS_BIN(botao1)) 
     {
         GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao1));
         gdk_color_parse ("green", &color1);
         gtk_widget_modify_fg (children, GTK_STATE_NORMAL, &color1);
     }
 
-    if(GTK_IS_BIN(botao2)) 
+    if(GTK_IS_BIN(botao2))
     {
         GtkWidget *children = gtk_bin_get_child(GTK_BIN(botao2));
         gdk_color_parse ("green", &color1);
