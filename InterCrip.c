@@ -27,7 +27,7 @@ long long int npublickey;
 long long int phi=0;
 long long int num_m[max];
 long long int dnumber;
-long int len,inde,letter,countlen=0,l=0;
+long long int len,inde,letter,countlen=0,l=0;
 char *rt;
 char cripto[max];
 const char *realtext;
