@@ -36,8 +36,8 @@ char *converttostring(const char *s)
 void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
 {
 	char msgenviada[4096], msgreceb[4096], user1[4096],msgant[4096],msg[4096],newmsg[4096]; // dois chars
-	int i,j, ult;
-	int p;
+	int i=0,j=0, ult;
+	int p,l=0;
   	char *msg1;
   	const char *mensagem;
   	long int lcount=0;
@@ -48,6 +48,9 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
   	u = converttostring(gtk_entry_get_text(GTK_ENTRY(user)));;
 
   	strcpy(user1,u);
+  	strcat(user1,"\n");
+  	printf("%s!!@@\n", user1);
+  	//printf("%d!\n",strlen(user1));
   	//printf("%s!\n",user1);
 	
 	write(meusocket, user1, strlen(user1));
@@ -63,28 +66,35 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
 
     msg1 = converttostring(gtk_entry_get_text(GTK_ENTRY(entrada)));
 	strcpy(msgenviada,msg1);
-	//printf("%s\n",msgenviada);
-    
+	strcat(msgenviada,"\n");
+
+	printf("%s&&\n",user1);
+
     for(i=0;user1[i] != '\n';i++)
     {
     	msg[i] = user1[i];
+    	//printf("%c!",user1[i]);
     }
-    msg[i] = ':';
+     printf("%s\n",msg);
+   	msg[i] = ':';
     i++;
     msg[i] = '\n';
 
-    for(j=0;msgenviada[j] != '\n'; j++)
+    for(j=0;msgenviada[j] != '\n';j++)
     {
     	msg[i] = msgenviada[j];
+    	//printf("%d*\n",j);
     	i++;
     }
   	msg[i] = '\n';
-
+  	printf("%s!!\n",msg);
+  	
    	for(i=0;i<strlen(msg);i++)
   	{
    	 	if(msg[i] == '\n') msg[i] = '#';
   	}
-
+  	strcat(msg,"\n");
+  	printf("%s!@!\n",msg);
 	write(meusocket,msg,strlen(msg));
 	
 
@@ -108,22 +118,24 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
    	 		//msgant[i] = '\n';
    	 	}  		
    	}
-   	 	//printf("Mensagem recebida:  %s \n Mensagem anterior : %s \n", msgreceb, msgant);
+	//printf("Mensagem recebida:  %s \n Mensagem anterior : %s \n", msgreceb, msgant);
 	for(i=0; i < ult;i++)
   	{
   		if(msgreceb[i] != msgant[i])
   		{
-  			newmsg[i]=msgreceb[i];
+  			newmsg[l]=msgreceb[i];
+  			l++;
   			//	printf("< %c >", msgant[i]);
   		}
   	}
-  	printf("%s\n",newmsg);
-  	mensagem = g_convert(newmsg, -1, "UTF-8", "ISO-8859-1", &bytes_read, &bytes_written, &error);
+  	strcat(newmsg,"\n");
+
+	mensagem = g_convert(newmsg, -1, "UTF-8", "ISO-8859-1", &bytes_read, &bytes_written, &error);
   	gtk_text_buffer_get_iter_at_line_index(saida,&inicio,lcount,0);
   	lcount++;
   	gtk_text_buffer_insert(saida,&inicio,mensagem,-1);
-		//printf(" %s\n", msgreceb);//printa mensagem recebida
-	for(i=0;i < 4096;i++)
+
+  	for(i=0;i < 4096;i++)
   	{
   		msgant[i] = msgreceb[i];
   		//	printf("<%c>", msgant[i]);		
@@ -133,9 +145,13 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
   		msgreceb[i] = 0;
   		//	printf("<%c>", msgant[i]);	
   	}
+  	i=j=0;
+  	//printf("%s\n",newmsg);
+  	//
+		//printf(" %s\n", msgreceb);//printa mensagem recebid
 }
 
-char imprimir( GtkWidget *widget,GtkWidget *entrada)
+char imprimir(GtkWidget *widget,GtkWidget *entrada)
 {
 	str_cli(stdin,meusocket,widget,entrada);
   	return 0;
@@ -151,6 +167,7 @@ void clique1( GtkWidget *widget,gpointer data)
 	GtkWidget *texto;
 	GtkWidget *send;
 	GtkAdjustment *hj;
+	//GtkIMContext * emo;
 	//GtkAdjustment *
 	// GtkDialogFlags flags = GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT;
 	// const gchar *this;
@@ -185,9 +202,14 @@ void clique1( GtkWidget *widget,gpointer data)
 	gtk_box_pack_start(GTK_BOX(box2),box3,FALSE,FALSE,0);
 
 	texto = gtk_entry_new();// para entrada de texto
-	gtk_entry_set_max_length(GTK_ENTRY(texto),180);//tamanho do texto
+	gtk_entry_set_max_length(GTK_ENTRY(texto),1000);//tamanho do texto
 	//g_signal_connect(texto,"activate",G_CALLBACK(imprimir),texto);//chama uma função que vai imprimir o texto
 	gtk_box_pack_start(GTK_BOX(box3),texto,FALSE,FALSE,0);//coloca na caixa
+
+	//emo = gtk_im_context_simple_new();
+	//gtk_im_context_simple_add_table (GTK_IM_CONTEXT_SIMPLE(emo), guint16 *data,GTK_MAX_COMPOSE_LEN,gint n_seqs);
+
+	//insert_emoji(); 
 
 	send = gtk_button_new_with_label("Enviar");
 	g_signal_connect(G_OBJECT(send),"clicked",G_CALLBACK(imprimir),texto);// função
