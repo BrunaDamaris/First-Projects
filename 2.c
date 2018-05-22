@@ -36,7 +36,7 @@ char *converttostring(const char *s)
 void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
 {
 	char msgenviada[4096], msgreceb[4096], user1[4096],msgant[4096],msg[4096],newmsg[4096]; // dois chars
-	int i=0,j=0, ult;
+	int i=0,j=0,ult=0;
 	int p,l=0;
   	char *msg1;
   	const char *mensagem;
@@ -68,14 +68,16 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
 	strcpy(msgenviada,msg1);
 	strcat(msgenviada,"\n");
 
-	printf("%s&&\n",user1);
 
     for(i=0;user1[i] != '\n';i++)
     {
     	msg[i] = user1[i];
-    	//printf("%c!",user1[i]);
     }
-     printf("%s\n",msg);
+    for(j=i;j < strlen(msg);j++)
+   	{
+   	 	msg[j] = ' ';
+   	}
+    //printf("(%s)\n",msg);
    	msg[i] = ':';
     i++;
     msg[i] = '\n';
@@ -86,15 +88,19 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
     	//printf("%d*\n",j);
     	i++;
     }
+     for(j=i;j < strlen(msg);j++)
+   	{
+   	 	msg[j] = ' ';
+   	}
   	msg[i] = '\n';
-  	printf("%s!!\n",msg);
+  	//printf("%s!!\n",msg);
   	
    	for(i=0;i<strlen(msg);i++)
   	{
    	 	if(msg[i] == '\n') msg[i] = '#';
   	}
   	strcat(msg,"\n");
-  	printf("%s!@!\n",msg);
+  	//printf("%s!@!\n",msg);
 	write(meusocket,msg,strlen(msg));
 	
 
@@ -108,13 +114,14 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
    	 		msgant[i] = '\n';
    	 	}  		
    	}
-		
+	printf("(/%s/)\n",msgreceb);
 	for(i=0;i< strlen(msgreceb);i++)
   	{
    	 	if(msgreceb[i] == '#') 
    	 	{
    	 		msgreceb[i] = '\n';
    	 		ult = i;
+   	 		break;
    	 		//msgant[i] = '\n';
    	 	}  		
    	}
@@ -123,16 +130,19 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
   	{
   		if(msgreceb[i] != msgant[i])
   		{
-  			newmsg[l]=msgreceb[i];
-  			l++;
-  			//	printf("< %c >", msgant[i]);
+  			newmsg[i] = msgreceb[i];
+  			//printf("< %c >", newmsg[i]);
   		}
   	}
+  	for(j=i;j < strlen(newmsg);j++)
+   	{
+   	 	newmsg[j] = ' ';
+   	}
   	strcat(newmsg,"\n");
+  	printf("(%s/)\n",newmsg);
 
 	mensagem = g_convert(newmsg, -1, "UTF-8", "ISO-8859-1", &bytes_read, &bytes_written, &error);
   	gtk_text_buffer_get_iter_at_line_index(saida,&inicio,lcount,0);
-  	lcount++;
   	gtk_text_buffer_insert(saida,&inicio,mensagem,-1);
 
   	for(i=0;i < 4096;i++)
@@ -145,7 +155,7 @@ void str_cli(FILE *fp,int meusocket,GtkWidget *widget,GtkWidget *entrada)
   		msgreceb[i] = 0;
   		//	printf("<%c>", msgant[i]);	
   	}
-  	i=j=0;
+  	i=j=l=0;
   	//printf("%s\n",newmsg);
   	//
 		//printf(" %s\n", msgreceb);//printa mensagem recebid
