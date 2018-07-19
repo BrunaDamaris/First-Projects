@@ -137,7 +137,7 @@ void criptografar(GtkWidget *widget,gpointer data)
 	}
 	for(inde=0;inde<len;inde++)
 	{
-		out1 = fopen("criptografado.txt","a+");
+		out1 = fopen("crypted.txt","a+");
 		numeric_m[inde] = fastexpmod(numeric_m[inde],enr,nkey);
 		fprintf(out1,"%lld ",numeric_m[inde]);
 		fclose(out1);
@@ -215,7 +215,7 @@ void fromfile(GtkWidget *widget,gpointer data)
 	char *numc;
 	FILE *f_in;
 	long long int ind=0,i,letter;
-	f_in = fopen ("decrypted.txt", "r"); 
+	f_in = fopen ("crypted.txt", "r"); 
   	while (!feof (f_in)) 
   	{
   		fscanf(f_in, "%Ld", &num_m[ind]); 
